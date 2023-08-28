@@ -17,6 +17,7 @@ func main() {
 
 	config := utils.LoadEnv(logger)
 	db := config.InitDB()
+	redis := config.InitRedis()
 
 	listener, err := net.Listen("tcp", config.APP_PORT)
 
@@ -28,7 +29,7 @@ func main() {
 	logger.Println("server started")
 	repo := repository.NewPostgresRepo(logger, db)
 
-	service := service.NewService(logger, repo)
+	service := service.NewService(logger, repo, redis)
 
 	pb.RegisterAuthServiceServer(server, service)
 	if err := server.Serve(listener); err != nil {

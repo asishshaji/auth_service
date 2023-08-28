@@ -9,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/redis/go-redis/v9"
 )
 
 type EnvironmentConfig struct {
@@ -18,6 +19,7 @@ type EnvironmentConfig struct {
 	DB_NAME     string
 	DB_USER     string
 	DB_PASSWORD string
+	REDIS_HOST  string
 	SSLMODE     string
 	l           *log.Logger
 }
@@ -35,6 +37,7 @@ func LoadEnv(l *log.Logger) *EnvironmentConfig {
 		DB_USER:     os.Getenv("DB_USER"),
 		SSLMODE:     os.Getenv("SSL_MODE"),
 		DB_PASSWORD: os.Getenv("DB_PASSWORD"),
+		REDIS_HOST:  os.Getenv("REDIS_HOST"),
 		l:           l,
 	}
 }
@@ -55,6 +58,14 @@ func (c *EnvironmentConfig) InitDB() *sqlx.DB {
 		c.l.Fatalf("error creating schema %s\n", err)
 	}
 	return db
+}
+
+func (c *EnvironmentConfig) InitRedis() *redis.Client {
+	return redis.NewClient(&redis.Options{
+		Addr:     c.REDIS_HOST,
+		Password: "",
+		DB:       0,
+	})
 }
 
 func installSchema(db *sqlx.DB) error {

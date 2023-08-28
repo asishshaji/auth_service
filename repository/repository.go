@@ -7,5 +7,6 @@ import (
 
 type IRepository interface {
 	InsertUser(context.Context, models.User) error
-	CheckUserNameExists(context.Context, string) bool
+	CheckUserNameExists(context.Context, string) (bool, error)
+	GetUserPassword(context.Context, string) (string, error)
 }
